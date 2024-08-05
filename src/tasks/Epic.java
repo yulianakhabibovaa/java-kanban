@@ -46,7 +46,7 @@ public class Epic extends Task {
         }
     }
 
-    public void cleanSubTask(SubTask subTask) {
+    public void clearSubTask(SubTask subTask) {
         if (subTasks.contains(subTask)) {
             subTasks.remove(subTask);
             setEpicStatus();
@@ -59,6 +59,10 @@ public class Epic extends Task {
             subTasks.add(subTask);
             setEpicStatus();
         }
+    }
+
+    public void clearSubTasks() {
+        subTasks.clear();
     }
 
     @Override

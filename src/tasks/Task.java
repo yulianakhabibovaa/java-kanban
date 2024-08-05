@@ -18,9 +18,7 @@ public class Task {
     }
 
     public Task(String title, String description) {
-        this.title = title;
-        this.description = description;
-        status = Status.NEW;
+        this(title, description, Status.NEW, 0);
     }
 
     public String getTitle() {
@@ -41,6 +39,18 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

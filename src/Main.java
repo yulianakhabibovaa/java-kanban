@@ -1,3 +1,4 @@
+import manager.TaskManager;
 import tasks.Status;
 import tasks.Task;
 import tasks.Epic;
@@ -34,8 +35,8 @@ public class Main {
 
         System.out.println("Удаляем задачи");
         taskManager.clearTaskById(task2.getId());
-        taskManager.clearTaskById(subTask2.getId());
-        taskManager.clearTaskById(epic2.getId());
+        taskManager.clearSubTaskById(subTask2.getId());
+        taskManager.clearEpicById(epic2.getId());
 
         System.out.println("Задачи : " + taskManager.getTasks());
         System.out.println("Эпики : " + taskManager.getEpics());
