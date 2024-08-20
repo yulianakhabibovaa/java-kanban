@@ -5,126 +5,45 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class TaskManager {
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
+public interface TaskManager {
+    ArrayList<Task> getTasks();
 
-    private int lastId;
+    ArrayList<Epic> getEpics();
 
-    public ArrayList<Task> getTasks() {
-        return new ArrayList<>(tasks.values());
-    }
+    ArrayList<SubTask> getSubTasks();
 
-    public ArrayList<Epic> getEpics() {
-        return new ArrayList<>(epics.values());
-    }
+    void clearTasks();
 
-    public ArrayList<SubTask> getSubTasks() {
-        return new ArrayList<>(subTasks.values());
-    }
+    void clearSubTasks();
 
-    public void clearTasks() {
-        tasks.clear();
-    }
+    void clearEpics();
 
-    public void clearSubTasks() {
-        for (Epic epic : epics.values()) {
-            epic.clearSubTasks();
-        }
-        subTasks.clear();
-    }
+    Task getTaskById(Integer id);
 
-    public void clearEpics() {
-        subTasks.clear();
-        epics.clear();
-    }
+    Epic getEpicById(Integer id);
 
-    public Task getTaskById(Integer id) {
-        return tasks.get(id);
-    }
+    SubTask getSubTaskById(Integer id);
 
-    public Task getEpicById(Integer id) {
-        return epics.get(id);
-    }
+    void clearTaskById(Integer id);
 
-    public Task getSubTaskById(Integer id) {
-        return subTasks.get(id);
-    }
+    void clearSubTaskById(Integer id);
 
-    public void clearTaskById(Integer id) {
-        tasks.remove(id);
-    }
+    void clearEpicById(Integer id);
 
-    public void clearSubTaskById(Integer id) {
-        SubTask subTask = subTasks.get(id);
-        subTask.getCurrentEpic().clearSubTask(subTask);
-        subTasks.remove(id);
-    }
+    ArrayList<SubTask> getSubTasksByEpic(Epic epic);
 
-    public void clearEpicById(Integer id) {
-        ArrayList<SubTask> epicSubTasks = epics.get(id).getSubTasks();
-        for (SubTask subTask : epicSubTasks) {
-            subTasks.remove(subTask.getId());
-        }
-        epics.remove(id);
-    }
+    Task create(Task task);
 
-    public ArrayList<SubTask> getSubTasksByEpic(Epic epic) {
-        return epic.getSubTasks();
-    }
+    Task update(Task task);
 
-    public Task create(Task task) {
-        task.setId(lastId++);
-        tasks.put(task.getId(), task);
-        return task;
-    }
+    Epic create(Epic epic);
 
-    public Task update(Task task) {
-        if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-            return task;
-        }
-        return null;
-    }
+    Epic update(Epic epic);
 
-    public Epic create(Epic epic) {
-        epic.setId(lastId++);
-        epics.put(epic.getId(), epic);
-        return epic;
-    }
+    SubTask create(SubTask subTask);
 
-    public Epic update(Epic epic) {
-        if (epics.containsKey(epic.getId())) {
-            epics.put(epic.getId(), epic);
-            return epic;
-        }
-        return null;
-    }
+    SubTask update(SubTask subTask);
 
-    public SubTask create(SubTask subTask) {
-        if (epics.containsKey(subTask.getCurrentEpic().getId())) {
-            subTask.setId(lastId++);
-            subTask.getCurrentEpic().addSubTask(subTask);
-            subTasks.put(subTask.getId(), subTask);
-            return subTask;
-        }
-        return null;
-    }
-
-    public SubTask update(SubTask subTask) {
-        if (subTasks.containsKey(subTask.getId()) && epics.containsKey(subTask.getCurrentEpic().getId())) {
-            if (subTasks.get(subTask.getId()).getCurrentEpic() == subTask.getCurrentEpic()) {
-                subTask.getCurrentEpic().updateSubTask(subTask);
-            } else {
-                subTasks.get(subTask.getId()).getCurrentEpic().clearSubTask(subTask);
-                subTask.getCurrentEpic().addSubTask(subTask);
-            }
-            subTasks.put(subTask.getId(), subTask);
-            return subTask;
-        }
-        return null;
-    }
+    ArrayList<Task> getHistory();
 }

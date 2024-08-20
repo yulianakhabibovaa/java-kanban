@@ -6,6 +6,10 @@ public class Epic extends Task {
 
     private ArrayList<SubTask> subTasks;
 
+    public Epic(Epic epic) {
+        this(epic.title, epic.description, epic.status, epic.id, epic.subTasks);
+    }
+
     public Epic(String title, String description, Status status, int id, ArrayList<SubTask> subTasks) {
         super(title, description, status, id);
         this.subTasks = subTasks;
@@ -63,6 +67,12 @@ public class Epic extends Task {
 
     public void clearSubTasks() {
         subTasks.clear();
+        setEpicStatus();
+    }
+
+    @Override
+    public Epic copy() {
+        return new Epic(this);
     }
 
     @Override

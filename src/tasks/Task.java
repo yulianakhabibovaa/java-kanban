@@ -9,6 +9,9 @@ public class Task {
     protected Status status;
     protected String description;
 
+    public Task(Task task) {
+        this(task.title, task.description, task.status, task.id);
+    }
 
     public Task(String title, String description, Status status, int id) {
         this.title = title;
@@ -51,6 +54,10 @@ public class Task {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Task copy() {
+        return new Task(this);
     }
 
     @Override
