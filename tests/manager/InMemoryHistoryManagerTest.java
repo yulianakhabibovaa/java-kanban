@@ -2,6 +2,7 @@ package manager;
 
 import history.HistoryManager;
 import history.InMemoryHistoryManager;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Status;
@@ -14,16 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class InMemoryHistoryManagerTest {
 
-    static HistoryManager historyManager;
+    private static HistoryManager historyManager;
+    private static Task task;
 
     @BeforeEach
-    void init() {
+    void initManager() {
         historyManager = new InMemoryHistoryManager();
+        task = new Task("задача", "описание");
     }
 
     @Test
     void shouldAddHistory() {
-        Task task = new Task("задача", "описание");
         historyManager.add(task);
 
         List<Task> history = historyManager.getHistory();
@@ -33,7 +35,6 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void shouldSavePreviousVersionInHistory() {
-        Task task = new Task("задача", "описание");
         historyManager.add(task);
 
         task.setStatus(Status.DONE);
