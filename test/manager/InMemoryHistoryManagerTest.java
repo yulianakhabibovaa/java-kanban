@@ -4,9 +4,11 @@ import history.HistoryManager;
 import history.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tasks.Epic;
 import tasks.Status;
 import tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,11 +18,15 @@ public class InMemoryHistoryManagerTest {
 
     private static HistoryManager historyManager;
     private static Task task;
+    private static Task taskTwo;
+    private static Epic taskThree;
 
     @BeforeEach
     void initManager() {
         historyManager = new InMemoryHistoryManager();
         task = new Task("задача", "описание");
+        taskTwo = new Task("задача2", "описание2", Status.NEW, 1);
+        taskThree = new Epic("эпик1", "описание3", Status.NEW, 2, new ArrayList<>());
     }
 
     @Test
@@ -62,5 +68,47 @@ public class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
 
         assertEquals(0, history.size(), "В истории не должно быть записей");
+    }
+
+    @Test
+    void shouldRemoveTaskFromBeginning() {
+        historyManager.add(task);
+        historyManager.add(taskTwo);
+        historyManager.add(taskThree);
+
+        historyManager.remove(task.getId());
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size(), "В истории должно быть 2 записи");
+        assertEquals(1, history.getFirst().getId(), "Первой по порядку станет вторая задача");
+        assertEquals(2, history.get(1).getId(), "Второй по порядку станет третья задача");
+    }
+
+    @Test
+    void shouldRemoveTaskFromMiddle() {
+        historyManager.add(task);
+        historyManager.add(taskTwo);
+        historyManager.add(taskThree);
+
+        historyManager.remove(taskTwo.getId());
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size(), "В истории должно быть 2 записи");
+        assertEquals(0, history.getFirst().getId(), "Первой по порядку станет вторая задача");
+        assertEquals(2, history.get(1).getId(), "Второй по порядку станет третья задача");
+    }
+
+    @Test
+    void shouldRemoveTaskFromEnding() {
+        historyManager.add(task);
+        historyManager.add(taskTwo);
+        historyManager.add(taskThree);
+
+        historyManager.remove(taskThree.getId());
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size(), "В истории должно быть 2 записи");
+        assertEquals(0, history.getFirst().getId(), "Первой по порядку станет вторая задача");
+        assertEquals(1, history.get(1).getId(), "Второй по порядку станет третья задача");
     }
 }

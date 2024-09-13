@@ -16,9 +16,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
-        if (mapOfHistory.containsKey(task.getId())) {
-            remove(task.getId());
-        }
+
+        remove(task.getId());
+
         Node newNode = new Node(task.copy());
         linkLast(newNode);
         mapOfHistory.put(task.getId(), newNode);
@@ -33,16 +33,16 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(int id) {
         if (mapOfHistory.containsKey(id)) {
             Node node = mapOfHistory.get(id);
-            if (node.getPrev() != null) {
-                node.getPrev().setNext(node.getNext());
+            if (node.prev != null) {
+                node.prev.next = node.next;
             } else {
-                firstNode = node.getNext();
+                firstNode = node.next;
             }
 
-            if (node.getNext() != null) {
-                node.getNext().setPrev(node.getPrev());
+            if (node.next != null) {
+                node.next.prev = node.prev;
             } else {
-                lastNode = node.getPrev();
+                lastNode = node.prev;
             }
 
             mapOfHistory.remove(id);
@@ -56,8 +56,8 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
-        node.setPrev(lastNode);
-        lastNode.setNext(node);
+        node.prev = lastNode;
+        lastNode.next = node;
         lastNode = node;
 
     }
@@ -66,10 +66,21 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node node = firstNode;
         ArrayList<Task> result = new ArrayList<>();
         while (node != null) {
-            result.add(node.getTask().copy());
-            node = node.getNext();
+            result.add(node.task.copy());
+            node = node.next;
         }
 
         return result;
     }
+
+    private static class Node {
+        private final Task task;
+        private Node prev;
+        private Node next;
+
+        public Node(Task task) {
+            this.task = task;
+        }
+    }
+
 }
