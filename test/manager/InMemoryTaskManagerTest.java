@@ -29,16 +29,17 @@ public class InMemoryTaskManagerTest {
     @Test
     void shouldCreateTask() {
         taskManager.create(task);
-        Task savedTask = taskManager.getTaskById(task.getId());
 
-        assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(task, savedTask, "Задачи не совпадают.");
+        assertEquals(1, taskManager.getTasks().size(), "Задача не найдена.");
+
+        Task savedTask = taskManager.getTaskById(0);
+        assertEquals("задача", savedTask.getTitle(), "Title не совпал");
+        assertEquals("я задача", savedTask.getDescription(), "Description не совпал");
+
 
         List<Task> tasks = taskManager.getTasks();
-
-        assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+        assertEquals(savedTask, tasks.getFirst(), "Задачи не совпали");
     }
 
     @Test
@@ -47,17 +48,21 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(1, taskManager.getEpics().size());
         assertEquals(0, savedEpic.getId());
-        assertEquals(epic, taskManager.getEpicById(0));
+        assertEquals("эпик", savedEpic.getTitle(), "Title не совпал");
+        assertEquals("я эпик", savedEpic.getDescription(), "Description не совпал");
+
     }
 
     @Test
     void shouldCreateSubTask() {
-        taskManager.create(epic);
+        Epic savedEpic = taskManager.create(epic);
         SubTask savedSubTask = taskManager.create(subTask);
 
         assertEquals(1, taskManager.getSubTasks().size());
         assertEquals(1, savedSubTask.getId());
-        assertEquals(subTask, taskManager.getSubTaskById(1));
+        assertEquals("задача", savedSubTask.getTitle(), "Title не совпал");
+        assertEquals("я подзадача", savedSubTask.getDescription(), "Description не совпал");
+        assertEquals(savedEpic, taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
     }
 
     @Test
@@ -70,11 +75,11 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void shouldNotCreateTaskWithSameId() {
-        taskManager.create(task);
+        Task savedTask = taskManager.create(task);
         Task anotherTask = taskManager.create(new Task("задача", "я задача", Status.NEW, 0));
 
         assertEquals(2, taskManager.getTasks().size());
-        assertEquals(0, task.getId());
+        assertEquals(0, savedTask.getId());
         assertEquals(1, anotherTask.getId());
         assertNotEquals(task, anotherTask);
     }
@@ -94,5 +99,18 @@ public class InMemoryTaskManagerTest {
         assertEquals("задача", check.getTitle());
         assertEquals("я задача", check.getDescription());
         assertEquals(Status.NEW, check.getStatus());
+    }
+
+    @Test
+    void shouldRemoveDeletedSubtaskFromEpic() {
+        Epic savedEpic = taskManager.create(epic);
+        SubTask savedSubTask = taskManager.create(subTask);
+
+        assertEquals(savedSubTask, savedEpic.getSubTasks().getFirst(), "В эпике не сохранилась подзадача");
+
+        taskManager.clearSubTaskById(savedSubTask.getId());
+
+        assertEquals(0, taskManager.getSubTasks().size(), "Не удалилась подзадача");
+        assertEquals(0, taskManager.getEpicById(savedEpic.getId()).getSubTasks().size(), "Не удалилась подзадача из эпика");
     }
 }
