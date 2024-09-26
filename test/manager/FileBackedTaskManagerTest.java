@@ -131,11 +131,13 @@ public class FileBackedTaskManagerTest {
     void shouldCreateTaskManagerFromEmptyFile() throws IOException {
         File emptyFile = File.createTempFile("empty", ".scv");
         FileBackedTaskManager fileManager = new FileBackedTaskManager(emptyFile);
+
         assertEquals(0, Files.size(emptyFile.toPath()));
         assertEquals(0, fileManager.getTasks().size());
         fileManager.clearTasks();
         assertEquals(1, Files.readAllLines(emptyFile.toPath()).size());
         assertEquals(SCV_HEAD, Files.readString(emptyFile.toPath()));
+
         emptyFile.delete();
     }
 
@@ -159,7 +161,6 @@ public class FileBackedTaskManagerTest {
         assertEquals(3, fileManager.getSubTasks().getFirst().getId());
         assertEquals(1, fileManager.getTasks().getFirst().getId());
         assertEquals(fileManager.getSubTaskById(3), fileManager.getEpicById(2).getSubTasks().getFirst());
-
 
         saveFile.delete();
     }
