@@ -10,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import static tasks.TaskType.*;
-
 public class FileBackedTaskManager extends InMemoryTaskManager {
     public static final String SCV_HEAD = "id,type,name,status,description,epic\n";
     private final File saveFile;
@@ -104,13 +102,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (FileWriter fw = new FileWriter(saveFile, false)) {
             fw.write(SCV_HEAD);
             for (Task task : tasks.values()) {
-                fw.write(toString(task));
+                fw.write(TaskUtils.toString(task));
             }
             for (Epic epic : epics.values()) {
-                fw.write(toString(epic));
+                fw.write(TaskUtils.toString(epic));
             }
             for (SubTask subTask : subTasks.values()) {
-                fw.write(toString(subTask));
+                fw.write(TaskUtils.toString(subTask));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении: " + e);
@@ -139,21 +137,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void importTaskFromString(String saveLine) {
         String[] split = saveLine.split(",");
-        switch (TaskType.valueOf(split[1])) {
+        int id = Integer.parseInt(split[0]);
+        TaskType type = TaskType.valueOf(split[1]);
+        String title = split[2];
+        String description = split[4];
+        Status status = Status.valueOf(split[3]);
+        int epicId = 0;
+        if (split.length == 6) {
+            epicId = Integer.parseInt(split[5]);
+        }
+
+        switch (type) {
             case TASK -> {
-                Task task = new Task(split[2], split[4], Status.valueOf(split[3]), Integer.parseInt(split[0]));
+                Task task = new Task(title, description, status, id);
                 tasks.put(task.getId(), task);
                 updateLastId(task.getId());
                 return;
             }
             case EPIC -> {
-                Epic epic = new Epic(split[2], split[4], Status.valueOf(split[3]), Integer.parseInt(split[0]), new ArrayList<>());
+                Epic epic = new Epic(title, description, status, id, new ArrayList<>());
                 epics.put(epic.getId(), epic);
                 updateLastId(epic.getId());
                 return;
             }
             case SUBTASK -> {
-                SubTask subTask = new SubTask(split[2], split[4], Status.valueOf(split[3]), Integer.parseInt(split[0]), epics.get(Integer.parseInt(split[5])));
+                SubTask subTask = new SubTask(title, description, status, id, epics.get(epicId));
                 epics.get(subTask.getCurrentEpic().getId()).addSubTask(subTask);
                 subTasks.put(subTask.getId(), subTask);
                 updateLastId(subTask.getId());
@@ -161,18 +169,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         }
         throw new ManagerImportTaskException("Не удалось считать задачу из строки: " + saveLine);
-    }
-
-    private String toString(Task task) {
-        return String.format("%s,%s,%s,%s,%s,\n", task.getId(), TASK, task.getTitle(), task.getStatus(), task.getDescription());
-    }
-
-    private String toString(SubTask task) {
-        return String.format("%s,%s,%s,%s,%s,%s\n", task.getId(), SUBTASK, task.getTitle(), task.getStatus(), task.getDescription(), task.getCurrentEpic().getId());
-    }
-
-    private String toString(Epic task) {
-        return String.format("%s,%s,%s,%s,%s,\n", task.getId(), EPIC, task.getTitle(), task.getStatus(), task.getDescription());
     }
 
     private void updateLastId(int id) {
