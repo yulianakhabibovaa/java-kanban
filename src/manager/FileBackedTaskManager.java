@@ -8,10 +8,12 @@ import tasks.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    public static final String SCV_HEAD = "id,type,name,status,description,epic\n";
+    public static final String SCV_HEAD = "id,type,name,status,description,duration,startTime,epic\n";
     private final File saveFile;
 
     public FileBackedTaskManager(File saveFile) {
@@ -142,14 +144,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = split[2];
         String description = split[4];
         Status status = Status.valueOf(split[3]);
+        Duration duration = Duration.ofMinutes(Long.parseLong(split[5]));
+        LocalDateTime startTime = LocalDateTime.parse(split[6], Task.DATE_TIME_FORMATER);
         int epicId = 0;
-        if (split.length == 6) {
-            epicId = Integer.parseInt(split[5]);
+        if (split.length == 8) {
+            epicId = Integer.parseInt(split[7]);
         }
 
         switch (type) {
             case TASK -> {
-                Task task = new Task(title, description, status, id);
+                Task task = new Task(title, description, status, id, duration, startTime);
                 tasks.put(task.getId(), task);
                 updateLastId(task.getId());
                 return;
@@ -161,7 +165,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return;
             }
             case SUBTASK -> {
-                SubTask subTask = new SubTask(title, description, status, id, epics.get(epicId));
+                SubTask subTask = new SubTask(title, description, status, id, duration, startTime, epics.get(epicId));
                 epics.get(subTask.getCurrentEpic().getId()).addSubTask(subTask);
                 subTasks.put(subTask.getId(), subTask);
                 updateLastId(subTask.getId());

@@ -7,6 +7,8 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,13 +19,14 @@ public class InMemoryTaskManagerTest {
     private static Task task;
     private static Epic epic;
     private static SubTask subTask;
+    private LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void initManager() {
         taskManager = new InMemoryTaskManager();
-        task = new Task("задача", "я задача");
+        task = new Task("задача", "я задача", Duration.ofMinutes(30L), now.plusMinutes(30L));
         epic = new Epic("эпик", "я эпик");
-        subTask = new SubTask("задача", "я подзадача", epic);
+        subTask = new SubTask("задача", "я подзадача", epic, Duration.ofMinutes(30L), now.plusMinutes(30L));
     }
 
     @Test
@@ -76,7 +79,7 @@ public class InMemoryTaskManagerTest {
     @Test
     void shouldNotCreateTaskWithSameId() {
         Task savedTask = taskManager.create(task);
-        Task anotherTask = taskManager.create(new Task("задача", "я задача", Status.NEW, 0));
+        Task anotherTask = taskManager.create(new Task("задача", "я задача", Status.NEW, 0, Duration.ofMinutes(30L), now.plusMinutes(30L)));
 
         assertEquals(2, taskManager.getTasks().size());
         assertEquals(0, savedTask.getId());

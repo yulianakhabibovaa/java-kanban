@@ -11,6 +11,8 @@ import tasks.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -24,14 +26,15 @@ public class FileBackedTaskManagerTest {
     private static Epic epic;
     private static SubTask subTask;
     private static File file;
+    private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void initManager() throws IOException {
         file = File.createTempFile("saveFile", ".csv");
         taskManager = new FileBackedTaskManager(file);
-        task = new Task("задача", "я задача");
+        task = new Task("задача", "я задача",  Duration.ofMinutes(30L), now.plusMinutes(30L));
         epic = new Epic("эпик", "я эпик");
-        subTask = new SubTask("задача", "я подзадача", epic);
+        subTask = new SubTask("задача", "я подзадача", epic, Duration.ofMinutes(60L), now.plusMinutes(60L));
     }
 
     @AfterEach
@@ -89,7 +92,7 @@ public class FileBackedTaskManagerTest {
     @Test
     void shouldNotCreateTaskWithSameId() {
         Task savedTask = taskManager.create(task);
-        Task anotherTask = taskManager.create(new Task("задача", "я задача", Status.NEW, 0));
+        Task anotherTask = taskManager.create(new Task("задача", "я задача", Status.NEW, 0, Duration.ofMinutes(60L), now.plusMinutes(60L)));
 
         assertEquals(2, taskManager.getTasks().size());
         assertEquals(0, savedTask.getId());
@@ -145,9 +148,9 @@ public class FileBackedTaskManagerTest {
     void shouldCreateTaskManagerFromNotEmptySaveFile() throws IOException {
         File saveFile = File.createTempFile("save", ".scv");
         Files.writeString(saveFile.toPath(), SCV_HEAD, TRUNCATE_EXISTING);
-        Files.writeString(saveFile.toPath(), "1,TASK,Task1,NEW,Description task1,\n", APPEND);
-        Files.writeString(saveFile.toPath(), "2,EPIC,Epic2,DONE,Description epic2,\n", APPEND);
-        Files.writeString(saveFile.toPath(), "3,SUBTASK,Sub Task2,DONE,Description sub task3,2\n", APPEND);
+        Files.writeString(saveFile.toPath(), "1,TASK,Task1,NEW,Description task1,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
+        Files.writeString(saveFile.toPath(), "2,EPIC,Epic2,DONE,Description epic2,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
+        Files.writeString(saveFile.toPath(), "3,SUBTASK,Sub Task2,DONE,Description sub task3,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",2\n", APPEND);
         assertEquals(4, Files.readAllLines(saveFile.toPath()).size());
 
         FileBackedTaskManager fileManager = new FileBackedTaskManager(saveFile);
@@ -174,9 +177,9 @@ public class FileBackedTaskManagerTest {
         List<String> lines = Files.readAllLines(file.toPath());
         assertEquals(4, lines.size());
         assertEquals(SCV_HEAD.trim(), lines.getFirst());
-        assertEquals("0,TASK,задача,NEW,я задача,", lines.get(1));
-        assertEquals("1,EPIC,эпик,NEW,я эпик,", lines.get(2));
-        assertEquals("2,SUBTASK,задача,NEW,я подзадача,1", lines.get(3));
+        assertEquals("0,TASK,задача,NEW,я задача,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + ",", lines.get(1));
+        assertEquals("1,EPIC,эпик,NEW,я эпик,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",", lines.get(2));
+        assertEquals("2,SUBTASK,задача,NEW,я подзадача,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",1", lines.get(3));
 
         FileBackedTaskManager fileManager = FileBackedTaskManager.loadFromFile(file);
         assertEquals(taskManager.getTaskById(0), fileManager.getTasks().getFirst());
