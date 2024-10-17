@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class InMemoryHistoryManagerTest {
+class InMemoryHistoryManagerTest {
 
     private static HistoryManager historyManager;
     private static Task task;
@@ -28,7 +28,7 @@ public class InMemoryHistoryManagerTest {
     void initManager() {
         historyManager = new InMemoryHistoryManager();
         task = new Task("задача", "описание", Duration.ofMinutes(30L), now.plusMinutes(30L));
-        taskTwo = new Task("задача2", "описание2", Status.NEW,  1, Duration.ofMinutes(60L), now.plusMinutes(60L));
+        taskTwo = new Task("задача2", "описание2", Status.NEW, 1, Duration.ofMinutes(60L), now.plusMinutes(60L));
         taskThree = new Epic("эпик1", "описание3", Status.NEW, 2, new ArrayList<>());
     }
 
@@ -37,6 +37,21 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(task);
 
         List<Task> history = historyManager.getHistory();
+        assertNotNull(history, "История не пустая.");
+        assertEquals(1, history.size(), "История не пустая.");
+
+        historyManager.add(task);
+        assertEquals(1, history.size(), "История не должна дублироваться.");
+    }
+
+    @Test
+    void shouldGetHistory() {
+        List<Task> history = historyManager.getHistory();
+        assertNotNull(history, "История не пустая.");
+        assertEquals(0, history.size(), "История пустая.");
+
+        historyManager.add(task);
+        history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
     }

@@ -17,12 +17,12 @@ public class Main {
 
         System.out.println("Заводим задачи");
         Task task1 = taskManager.create(new Task("Задача 1", "Описание задачи 1", Duration.ofMinutes(30L), now.plusMinutes(30L)));
-        Task task2 = taskManager.create(new Task("Задача 2", "Описание задачи 2", Duration.ofMinutes(60L), now.plusMinutes(60L)));
+        Task task2 = taskManager.create(new Task("Задача 2", "Описание задачи 2", Duration.ofMinutes(30L), now.plusMinutes(60L)));
         Epic epic1 = taskManager.create(new Epic("Эпик 1", "Описание эпика 1"));
-        SubTask subTask1 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic1, Duration.ofMinutes(60L), now.plusMinutes(60L)));
-        SubTask subTask2 = taskManager.create(new SubTask("Подзадача 2", "Описание подзадачи 2", epic1, Duration.ofMinutes(60L), now.plusMinutes(60L)));
+        SubTask subTask1 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic1, Duration.ofMinutes(30L), now.plusMinutes(90L)));
+        SubTask subTask2 = taskManager.create(new SubTask("Подзадача 2", "Описание подзадачи 2", epic1, Duration.ofMinutes(30L), now.plusMinutes(120L)));
         Epic epic2 = taskManager.create(new Epic("Эпик 2", "Описание эпика 2"));
-        SubTask subTask3 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic2, Duration.ofMinutes(60L), now.plusMinutes(60L)));
+        SubTask subTask3 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic2, Duration.ofMinutes(30L), now.plusMinutes(150L)));
         taskManager.getEpicById(2);
         taskManager.getSubTaskById(6);
         taskManager.getTaskById(0);
@@ -30,11 +30,11 @@ public class Main {
         printAllTasks(taskManager);
 
         System.out.println("Меняем статусы задач");
-        task1 = taskManager.update(new Task(task1.getTitle(), task1.getDescription(), Status.DONE, task1.getId(), Duration.ofMinutes(60L), now.plusMinutes(60L)));
-        task2 = taskManager.update(new Task(task2.getTitle(), task2.getDescription(), Status.IN_PROGRESS, task2.getId(), Duration.ofMinutes(60L), now.plusMinutes(60L)));
-        subTask1 = taskManager.update(new SubTask(subTask1.getTitle(), subTask1.getDescription(), Status.DONE, subTask1.getId(), Duration.ofMinutes(60L), now.plusMinutes(60L), subTask1.getCurrentEpic()));
-        subTask2 = taskManager.update(new SubTask(subTask2.getTitle(), subTask2.getDescription(), Status.IN_PROGRESS, subTask2.getId(), Duration.ofMinutes(60L), now.plusMinutes(60L), subTask2.getCurrentEpic()));
-        subTask3 = taskManager.update(new SubTask(subTask3.getTitle(), subTask3.getDescription(), Status.DONE, subTask3.getId(), Duration.ofMinutes(60L), now.plusMinutes(60L), subTask3.getCurrentEpic()));
+        task1 = taskManager.update(new Task(task1.getTitle(), task1.getDescription(), Status.DONE, task1.getId(), Duration.ofMinutes(30L), now.plusMinutes(30L)));
+        task2 = taskManager.update(new Task(task2.getTitle(), task2.getDescription(), Status.IN_PROGRESS, task2.getId(), Duration.ofMinutes(30L), now.plusMinutes(60L)));
+        subTask1 = taskManager.update(new SubTask(subTask1.getTitle(), subTask1.getDescription(), Status.DONE, subTask1.getId(), Duration.ofMinutes(30L), now.plusMinutes(90L), subTask1.getCurrentEpic()));
+        subTask2 = taskManager.update(new SubTask(subTask2.getTitle(), subTask2.getDescription(), Status.IN_PROGRESS, subTask2.getId(), Duration.ofMinutes(30L), now.plusMinutes(120L), subTask2.getCurrentEpic()));
+        subTask3 = taskManager.update(new SubTask(subTask3.getTitle(), subTask3.getDescription(), Status.DONE, subTask3.getId(), Duration.ofMinutes(30L), now.plusMinutes(150L), subTask3.getCurrentEpic()));
 
         printAllTasks(taskManager);
 

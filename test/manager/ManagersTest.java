@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-public class ManagersTest {
+class ManagersTest {
 
     private final LocalDateTime now = LocalDateTime.now();
 

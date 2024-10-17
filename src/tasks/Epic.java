@@ -4,12 +4,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static tasks.TaskUtils.startDateToString;
 
 public class Epic extends Task {
 
-    private ArrayList<SubTask> subTasks;
+    private final ArrayList<SubTask> subTasks;
     private LocalDateTime endTime;
 
     public Epic(Epic epic) {
@@ -91,23 +92,14 @@ public class Epic extends Task {
     }
 
     private Duration calculateDuration() {
-        Duration sum = Duration.ofSeconds(0);
-        if (subTasks != null) {
-            for (SubTask task : subTasks) {
-                sum = sum.plus(task.duration);
-            }
-        }
-        return sum;
+        return Optional.ofNullable(subTasks).orElse(new ArrayList<>()).stream().map(Task::getDuration).reduce(Duration::plus).orElse(Duration.ofSeconds(0));
     }
 
     private LocalDateTime calculateStartTime() {
         if (subTasks == null) {
             return null;
         }
-        return subTasks.stream()
-                .map(task -> task.startTime)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        return subTasks.stream().map(task -> task.startTime).min(LocalDateTime::compareTo).orElse(null);
     }
 
     private LocalDateTime calculateEndTime() {
@@ -132,15 +124,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subTasks=" + subTasks +
-                ", title='" + title + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", description='" + description + '\'' +
-                ", duration=" + duration.toMinutes() +
-                ", startTime=" + startDateToString(this) +
-                '}';
+        return "Epic{" + "subTasks=" + subTasks + ", title='" + title + '\'' + ", id=" + id + ", status=" + status + ", description='" + description + '\'' + ", duration=" + duration.toMinutes() + ", startTime=" + startDateToString(this) + '}';
     }
 }
 
