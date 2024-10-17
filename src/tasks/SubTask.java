@@ -1,19 +1,22 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private Epic currentEpic;
 
     public SubTask(SubTask subTask) {
-        this(subTask.title, subTask.description, subTask.status, subTask.id, subTask.currentEpic);
+        this(subTask.title, subTask.description, subTask.status, subTask.id, subTask.duration, subTask.startTime, subTask.currentEpic);
     }
 
-    public SubTask(String title, String description, Status status, int id, Epic currentEpic) {
-        super(title, description, status, id);
+    public SubTask(String title, String description, Status status, int id, Duration duration, LocalDateTime startTime, Epic currentEpic) {
+        super(title, description, status, id, duration, startTime);
         this.currentEpic = currentEpic;
     }
 
-    public SubTask(String title, String description, Epic currentEpic) {
-        super(title, description);
+    public SubTask(String title, String description, Epic currentEpic, Duration duration, LocalDateTime startTime) {
+        super(title, description, duration, startTime);
         this.currentEpic = currentEpic;
     }
 
@@ -34,6 +37,8 @@ public class SubTask extends Task {
                 ", id=" + id +
                 ", status=" + status +
                 ", description='" + description + '\'' +
+                ", duration=" + duration.toMinutes() +
+                ", startTime=" + startTime.format(DATE_TIME_FORMATER) +
                 '}';
     }
 }
