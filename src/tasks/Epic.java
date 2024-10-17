@@ -1,23 +1,40 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static tasks.TaskUtils.startDateToString;
 
 public class Epic extends Task {
 
-    private ArrayList<SubTask> subTasks;
+    private final ArrayList<SubTask> subTasks;
+    private LocalDateTime endTime;
 
     public Epic(Epic epic) {
-        this(epic.title, epic.description, epic.status, epic.id, epic.subTasks);
+        this(epic.title, epic.description, epic.status, epic.id, epic.subTasks, epic.duration, epic.startTime);
     }
 
-    public Epic(String title, String description, Status status, int id, ArrayList<SubTask> subTasks) {
+    public Epic(String title, String description, Status status, int id, List<SubTask> subTasks, Duration duration, LocalDateTime startTime) {
+        super(title, description, status, id, duration, startTime);
+        this.subTasks = (ArrayList<SubTask>) subTasks;
+        endTime = calculateEndTime();
+    }
+
+    public Epic(String title, String description, Status status, int id, List<SubTask> subTasks) {
         super(title, description, status, id);
-        this.subTasks = subTasks;
+        this.duration = calculateDuration();
+        this.startTime = calculateStartTime();
+        this.subTasks = (ArrayList<SubTask>) subTasks;
+        endTime = calculateEndTime();
     }
 
     public Epic(String title, String description) {
         super(title, description);
         this.subTasks = new ArrayList<>();
+
     }
 
     public ArrayList<SubTask> getSubTasks() {
@@ -47,6 +64,7 @@ public class Epic extends Task {
         if (!subTasks.contains(subTask)) {
             subTasks.add(subTask);
             setEpicStatus();
+            calculateTimes();
         }
     }
 
@@ -54,6 +72,7 @@ public class Epic extends Task {
         if (subTasks.contains(subTask)) {
             subTasks.remove(subTask);
             setEpicStatus();
+            calculateTimes();
         }
     }
 
@@ -62,12 +81,40 @@ public class Epic extends Task {
             subTasks.remove(subTask);
             subTasks.add(subTask);
             setEpicStatus();
+            calculateTimes();
         }
     }
 
     public void clearSubTasks() {
         subTasks.clear();
         setEpicStatus();
+        calculateTimes();
+    }
+
+    private Duration calculateDuration() {
+        return Optional.ofNullable(subTasks).orElse(new ArrayList<>()).stream().map(Task::getDuration).reduce(Duration::plus).orElse(Duration.ofSeconds(0));
+    }
+
+    private LocalDateTime calculateStartTime() {
+        if (subTasks == null) {
+            return null;
+        }
+        return subTasks.stream().map(task -> task.startTime).min(LocalDateTime::compareTo).orElse(null);
+    }
+
+    private LocalDateTime calculateEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    private void calculateTimes() {
+        duration = calculateDuration();
+        startTime = calculateStartTime();
+        endTime = calculateEndTime();
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override
@@ -77,13 +124,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subTasks=" + subTasks +
-                ", title='" + title + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                ", description='" + description + '\'' +
-                '}';
+        return "Epic{" + "subTasks=" + subTasks + ", title='" + title + '\'' + ", id=" + id + ", status=" + status + ", description='" + description + '\'' + ", duration=" + duration.toMinutes() + ", startTime=" + startDateToString(this) + '}';
     }
 }
 

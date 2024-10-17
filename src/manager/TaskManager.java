@@ -13,6 +13,8 @@ public interface TaskManager {
 
     ArrayList<SubTask> getSubTasks();
 
+    ArrayList<Task> getPrioritizedTasks();
+
     void clearTasks();
 
     void clearSubTasks();
