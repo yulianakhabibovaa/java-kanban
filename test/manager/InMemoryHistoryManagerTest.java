@@ -29,7 +29,7 @@ class InMemoryHistoryManagerTest {
         historyManager = new InMemoryHistoryManager();
         task = new Task("задача", "описание", Duration.ofMinutes(30L), now.plusMinutes(30L));
         taskTwo = new Task("задача2", "описание2", Status.NEW, 1, Duration.ofMinutes(60L), now.plusMinutes(60L));
-        taskThree = new Epic("эпик1", "описание3", Status.NEW, 2, new ArrayList<>());
+        taskThree = new Epic("эпик1", "описание3", Status.NEW, 2, new ArrayList<>(), Duration.ZERO, null, null);
     }
 
     @Test

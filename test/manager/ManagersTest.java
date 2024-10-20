@@ -46,7 +46,7 @@ class ManagersTest {
     void shouldReturnWorkingDefaultHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-        Epic epic = new Epic("эпик", "я эпик 1", Status.NEW, 1, new ArrayList<>());
+        Epic epic = new Epic("эпик", "я эпик 1", Status.NEW, 1, new ArrayList<>(), Duration.ZERO, null, null);
         SubTask subTask = new SubTask("подзадача", "я подзадача 1", Status.NEW, 2, Duration.ofMinutes(30L), now.plusMinutes(30L), epic);
         Task task = new Task("задача", "я  задача", Status.NEW, 3, Duration.ofMinutes(30L), now.plusMinutes(30L));
 

@@ -337,6 +337,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task task5 = new Task("задача 4", "я задача 4", Duration.ofMinutes(100L), now.plusMinutes(55L));
 
         taskManager.create(task1);
+        assertThrows(ManagerTimeCrossingException.class, () -> taskManager.create(task1), "Полное совпадение недопустимо");
         assertThrows(ManagerTimeCrossingException.class, () -> taskManager.create(task2), "Пересечение в начале недопустимо");
         assertThrows(ManagerTimeCrossingException.class, () -> taskManager.create(task3), "Пересечение в конце недопустимо");
         assertThrows(ManagerTimeCrossingException.class, () -> taskManager.create(task4), "Пересечение в середине недопустимо");

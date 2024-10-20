@@ -3,6 +3,8 @@ package tasks;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static tasks.TaskUtils.dateToString;
+
 public class SubTask extends Task {
     private Epic currentEpic;
 
@@ -38,7 +40,8 @@ public class SubTask extends Task {
                 ", status=" + status +
                 ", description='" + description + '\'' +
                 ", duration=" + duration.toMinutes() +
-                ", startTime=" + startTime.format(DATE_TIME_FORMATER) +
+                ", startTime=" + dateToString(startTime) +
+                ", endTime=" + dateToString(getEndTime()) +
                 '}';
     }
 }

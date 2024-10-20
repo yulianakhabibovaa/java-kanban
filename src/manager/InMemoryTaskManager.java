@@ -6,13 +6,12 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Comparator<Task> priorityComparator = Comparator.comparing(Task::getStartTime);
@@ -227,7 +226,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean isTimeCrossing(Task task1, Task task2) {
-        List<Task> sorted = Stream.of(task1, task2).sorted(Comparator.comparing(Task::getStartTime)).toList();
-        return sorted.get(1).getStartTime().isBefore(sorted.get(0).getEndTime());
+        LocalDateTime task1End = task1.getEndTime();
+        LocalDateTime task2End = task2.getEndTime();
+        return task1.getStartTime().isBefore(task2End) && task1End.isAfter(task2.getStartTime());
     }
 }

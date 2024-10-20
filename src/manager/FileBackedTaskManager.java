@@ -12,8 +12,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import static tasks.Task.DATE_TIME_FORMATER;
+
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    public static final String SCV_HEAD = "id,type,name,status,description,duration,startTime,epic\n";
+    public static final String SCV_HEAD = "id,type,name,status,description,duration,startTime,endTime,epic\n";
     private final File saveFile;
 
     public FileBackedTaskManager(File saveFile) {
@@ -145,10 +147,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String description = split[4];
         Status status = Status.valueOf(split[3]);
         Duration duration = Duration.ofMinutes(Long.parseLong(split[5]));
-        LocalDateTime startTime = LocalDateTime.parse(split[6], Task.DATE_TIME_FORMATER);
+        LocalDateTime startTime = LocalDateTime.parse(split[6], DATE_TIME_FORMATER);
+        LocalDateTime endTime = LocalDateTime.parse(split[7], DATE_TIME_FORMATER);
         int epicId = 0;
-        if (split.length == 8) {
-            epicId = Integer.parseInt(split[7]);
+        if (split.length == 9) {
+            epicId = Integer.parseInt(split[8]);
         }
 
         switch (type) {
@@ -156,10 +159,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Task task = new Task(title, description, status, id, duration, startTime);
                 tasks.put(task.getId(), task);
                 updateLastId(task.getId());
+                if (task.getStartTime() != null) {
+                    prioritisedTasks.add(task.copy());
+                }
                 return;
             }
             case EPIC -> {
-                Epic epic = new Epic(title, description, status, id, new ArrayList<>());
+                Epic epic = new Epic(title, description, status, id, new ArrayList<>(), duration, startTime, endTime);
                 epics.put(epic.getId(), epic);
                 updateLastId(epic.getId());
                 return;
@@ -169,6 +175,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epics.get(subTask.getCurrentEpic().getId()).addSubTask(subTask);
                 subTasks.put(subTask.getId(), subTask);
                 updateLastId(subTask.getId());
+                if (subTask.getStartTime() != null) {
+                    prioritisedTasks.add(subTask.copy());
+                }
                 return;
             }
         }

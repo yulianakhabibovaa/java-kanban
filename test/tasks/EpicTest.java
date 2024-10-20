@@ -19,7 +19,7 @@ class EpicTest {
 
     @BeforeEach
     void initManager() {
-        epic = new Epic("Эпик", "Описание", Status.NEW, 1, new ArrayList<>());
+        epic = new Epic("Эпик", "Описание", Status.NEW, 1, new ArrayList<>(), Duration.ZERO, null, null);
         subTaskNew = new SubTask("задача", "я подзадача", Status.NEW, 2, Duration.ofMinutes(60L), now, epic);
         subTaskDone = new SubTask("задача", "я подзадача", Status.DONE, 3, Duration.ofMinutes(60L), now, epic);
         subTaskInProgress = new SubTask("задача", "я подзадача", Status.IN_PROGRESS, 4, Duration.ofMinutes(60L), now, epic);
@@ -27,7 +27,7 @@ class EpicTest {
 
     @Test
     void shouldEpicsBeEqualIfIdIsEqual() {
-        Epic epic2 = new Epic("Задача2", "Описание2", Status.NEW, 1, new ArrayList<>());
+        Epic epic2 = new Epic("Задача2", "Описание2", Status.NEW, 1, new ArrayList<>(), Duration.ZERO, null, null);
 
         assertEquals(epic, epic2);
     }

@@ -3,7 +3,10 @@ package tasks;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+
+import static tasks.TaskUtils.dateToString;
 
 public class Task {
 
@@ -29,7 +32,7 @@ public class Task {
     public Task(String title, String description, Status status, int id, Duration duration, LocalDateTime startTime) {
         this(title, description, status, id);
         this.duration = duration;
-        this.startTime = startTime;
+        this.startTime = startTime == null ? null : startTime.truncatedTo(ChronoUnit.SECONDS);
     }
 
     protected Task(String title, String description) {
@@ -77,7 +80,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
+        return startTime == null ? null : startTime.plus(duration);
     }
 
     public Duration getDuration() {
@@ -109,7 +112,8 @@ public class Task {
                 ", status=" + status +
                 ", description='" + description + '\'' +
                 ", duration=" + duration.toMinutes() +
-                ", startTime=" + startTime.format(DATE_TIME_FORMATER) +
+                ", startTime=" + dateToString(startTime) +
+                ", endTime=" + dateToString(getEndTime()) +
                 '}';
     }
 }
