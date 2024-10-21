@@ -29,7 +29,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void initManager() {
         task = new Task("задача", "я задача", Duration.ofMinutes(30L), now);
         epic = new Epic("эпик", "я эпик");
-        subTask = new SubTask("задача", "я подзадача", epic, Duration.ofMinutes(30L), now.plusMinutes(30L));
+        subTask = new SubTask("подзадача", "я подзадача", epic, Duration.ofMinutes(30L), now.plusMinutes(30L));
     }
 
     protected abstract T createTaskManager();
@@ -190,7 +190,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(1, taskManager.getSubTasks().size());
         assertEquals(1, savedSubTask.getId());
-        assertEquals("задача", savedSubTask.getTitle(), "Title не совпал");
+        assertEquals("подзадача", savedSubTask.getTitle(), "Title не совпал");
         assertEquals("я подзадача", savedSubTask.getDescription(), "Description не совпал");
         assertEquals(savedEpic, taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
     }

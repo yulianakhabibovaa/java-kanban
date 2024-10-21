@@ -185,7 +185,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void updateLastId(int id) {
-        if (id > lastId) {
+        if (id >= lastId) {
             lastId = id + 1;
         }
     }

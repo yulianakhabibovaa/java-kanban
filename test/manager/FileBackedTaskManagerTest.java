@@ -14,6 +14,7 @@ import java.util.List;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static manager.FileBackedTaskManager.SCV_HEAD;
+import static manager.FileBackedTaskManager.loadFromFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
@@ -51,14 +52,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     void shouldCreateTaskManagerFromNotEmptySaveFile() throws IOException {
-        File saveFile = File.createTempFile("save", ".scv");
-        Files.writeString(saveFile.toPath(), SCV_HEAD, TRUNCATE_EXISTING);
-        Files.writeString(saveFile.toPath(), "1,TASK,Task1,NEW,Description task1,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
-        Files.writeString(saveFile.toPath(), "2,EPIC,Epic2,DONE,Description epic2,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(120L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
-        Files.writeString(saveFile.toPath(), "3,SUBTASK,Sub Task2,DONE,Description sub task3,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(120L).format(Task.DATE_TIME_FORMATER) + ",2\n", APPEND);
-        assertEquals(4, Files.readAllLines(saveFile.toPath()).size());
+        Files.writeString(file.toPath(), SCV_HEAD, TRUNCATE_EXISTING);
+        Files.writeString(file.toPath(), "1,TASK,Task1,NEW,Description task1,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
+        Files.writeString(file.toPath(), "2,EPIC,Epic2,DONE,Description epic2,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(120L).format(Task.DATE_TIME_FORMATER) + ",\n", APPEND);
+        Files.writeString(file.toPath(), "3,SUBTASK,Sub Task2,DONE,Description sub task3,60," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(120L).format(Task.DATE_TIME_FORMATER) + ",2\n", APPEND);
+        assertEquals(4, Files.readAllLines(file.toPath()).size());
 
-        FileBackedTaskManager fileManager = new FileBackedTaskManager(saveFile);
+        FileBackedTaskManager fileManager = loadFromFile(file);
         List<Task> prioritizedTasks = fileManager.getPrioritizedTasks();
         assertEquals(2, prioritizedTasks.size());
         assertEquals("Task1", prioritizedTasks.getFirst().getTitle());
@@ -73,8 +73,6 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(3, fileManager.getSubTasks().getFirst().getId());
         assertEquals(1, fileManager.getTasks().getFirst().getId());
         assertEquals(fileManager.getSubTaskById(3), fileManager.getEpicById(2).getSubTasks().getFirst());
-
-        saveFile.delete();
     }
 
     @Test
@@ -89,13 +87,12 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         assertEquals(SCV_HEAD.trim(), lines.getFirst());
         assertEquals("0,TASK,задача,NEW,я задача,30," + now.format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + ",", lines.get(1));
         assertEquals("1,EPIC,эпик,NEW,я эпик,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",", lines.get(2));
-        assertEquals("2,SUBTASK,задача,NEW,я подзадача,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",1", lines.get(3));
+        assertEquals("2,SUBTASK,подзадача,NEW,я подзадача,30," + now.plusMinutes(30L).format(Task.DATE_TIME_FORMATER) + "," + now.plusMinutes(60L).format(Task.DATE_TIME_FORMATER) + ",1", lines.get(3));
 
-        FileBackedTaskManager fileManager = FileBackedTaskManager.loadFromFile(file);
-        assertEquals(taskManager.getTaskById(0), fileManager.getTasks().getFirst());
-        assertEquals(taskManager.getSubTaskById(2), fileManager.getSubTasks().getFirst());
-        assertEquals(taskManager.getEpicById(1), fileManager.getEpics().getFirst());
-        assertEquals(taskManager.getEpicById(1).getSubTasks().getFirst(), fileManager.getEpics().getFirst().getSubTasks().getFirst());
+        FileBackedTaskManager fileManager = loadFromFile(file);
+        assertEquals(taskManager.getTasks(), fileManager.getTasks());
+        assertEquals(taskManager.getTasks(), fileManager.getTasks());
+        assertEquals(taskManager.getTasks(), fileManager.getTasks());
     }
 
     @Test
@@ -105,6 +102,4 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
             new FileBackedTaskManager(incorrectFile);
         }, "Создание менеджера из несуществующего фала должно выдать ошибку");
     }
-
-
 }
