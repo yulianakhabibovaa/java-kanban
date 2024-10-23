@@ -7,21 +7,25 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-public class ManagersTest {
+class ManagersTest {
+
+    private final LocalDateTime now = LocalDateTime.now();
 
     @Test
     void shouldReturnWorkingDefaultTaskManager() {
         TaskManager taskManager = Managers.getDefault();
 
         Epic epic = taskManager.create(new Epic("эпик", "я эпик 1"));
-        SubTask subTask = taskManager.create(new SubTask("подзадача", "я подзадача 1", epic));
-        Task task = taskManager.create(new Task("задача", "я  задача"));
+        SubTask subTask = taskManager.create(new SubTask("подзадача", "я подзадача 1", epic, Duration.ofMinutes(30L), now.plusMinutes(30L)));
+        Task task = taskManager.create(new Task("задача", "я  задача", Duration.ofMinutes(60L), now.plusMinutes(60L)));
         subTask.setStatus(Status.IN_PROGRESS);
         taskManager.update(subTask);
 
@@ -42,9 +46,9 @@ public class ManagersTest {
     void shouldReturnWorkingDefaultHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-        Epic epic = new Epic("эпик", "я эпик 1", Status.NEW, 1, new ArrayList<>());
-        SubTask subTask = new SubTask("подзадача", "я подзадача 1", Status.NEW, 2, epic);
-        Task task = new Task("задача", "я  задача", Status.NEW, 3);
+        Epic epic = new Epic("эпик", "я эпик 1", Status.NEW, 1, new ArrayList<>(), Duration.ZERO, null, null);
+        SubTask subTask = new SubTask("подзадача", "я подзадача 1", Status.NEW, 2, Duration.ofMinutes(30L), now.plusMinutes(30L), epic);
+        Task task = new Task("задача", "я  задача", Status.NEW, 3, Duration.ofMinutes(30L), now.plusMinutes(30L));
 
         historyManager.add(task);
         historyManager.add(epic);
