@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(Integer id) throws NotFoundException {
+    public Task getTaskById(Integer id) {
         if (!tasks.containsKey(id)) {
             throw new NotFoundException("Задача не найдена!");
         }
@@ -79,8 +80,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(id)) {
             throw new NotFoundException("Эпик не найден!");
         }
-        Epic result = epics.get(id).copy();
-        addToHistory(result);
+        Epic result = epics.get(id);
+        addToHistory(result.copy());
         return result;
     }
 
@@ -127,9 +128,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NotFoundException("Эпик не найден!");
         }
         ArrayList<SubTask> subtasks = epics.get(id).getSubTasks();
-        if (subtasks == null) {
-            return new ArrayList<>();
-        }
         return new ArrayList<>(subtasks);
     }
 
@@ -207,7 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritisedTasks.remove(subTasks.get(subTask.getId()));
             SubTask added = subTask.copy();
             Epic updatedEpic = epics.get(subTask.getCurrentEpic());
-            if (subTasks.get(subTask.getId()).getCurrentEpic() == subTask.getCurrentEpic()) {
+            if (Objects.equals(subTasks.get(subTask.getId()).getCurrentEpic(), subTask.getCurrentEpic())) {
                 updatedEpic.updateSubTask(added);
             } else {
                 epics.get(subTasks.get(subTask.getId()).getCurrentEpic()).clearSubTask(subTask);

@@ -17,9 +17,9 @@ public class Epic extends Task {
         this(epic.title, epic.description, epic.status, epic.id, epic.subTasks, epic.duration, epic.startTime, epic.endTime);
     }
 
-    public Epic(String title, String description, Status status, int id, List<SubTask> subTasks, Duration duration, LocalDateTime startTime, LocalDateTime endTime) {
+    public Epic(String title, String description, Status status, Integer id, List<SubTask> subTasks, Duration duration, LocalDateTime startTime, LocalDateTime endTime) {
         super(title, description, status, id, duration, startTime);
-        this.subTasks = (ArrayList<SubTask>) subTasks;
+        this.subTasks = subTasks == null ? new ArrayList<>() : (ArrayList<SubTask>) subTasks;
         this.endTime = endTime == null ? null : endTime.truncatedTo(ChronoUnit.SECONDS);
     }
 
@@ -52,9 +52,7 @@ public class Epic extends Task {
     }
 
     public void addSubTask(SubTask subTask) {
-        if (subTasks == null) {
-            subTasks = new ArrayList<>(List.of(subTask));
-        } else if (!subTasks.contains(subTask)) {
+        if (!subTasks.contains(subTask)) {
             subTasks.add(subTask);
         }
         setEpicStatus();

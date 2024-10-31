@@ -1,7 +1,6 @@
 package manager;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Task;
 
@@ -21,13 +20,10 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private static File file;
     private final LocalDateTime now = LocalDateTime.now();
 
-    @BeforeEach
-    void init() throws IOException {
-        file = File.createTempFile("saveFile", ".csv");
-    }
 
     @Override
-    protected FileBackedTaskManager createTaskManager() {
+    protected FileBackedTaskManager createTaskManager() throws IOException {
+        file = File.createTempFile("saveFile", ".csv");
         return new FileBackedTaskManager(file);
     }
 

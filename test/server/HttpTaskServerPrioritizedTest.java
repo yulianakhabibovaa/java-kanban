@@ -24,20 +24,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HttpTaskServerPrioritizedTest {
 
     InMemoryTaskManager manager;
+    HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void initServer() throws IOException {
         manager = new InMemoryTaskManager();
-        HttpTaskServer.setManager(manager);
-        HttpTaskServer.start();
+        server = new HttpTaskServer(manager);
+        server.start();
     }
 
     @AfterEach
     void stopServer() {
-        HttpTaskServer.stop();
-        HttpTaskServer.setManager(null);
+        server.stop();
     }
 
     @Test

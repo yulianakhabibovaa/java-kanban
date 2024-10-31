@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class HttpTaskServerSubtasksTest {
 
     InMemoryTaskManager manager;
+    HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
     Epic epic;
@@ -35,14 +36,13 @@ class HttpTaskServerSubtasksTest {
         manager = new InMemoryTaskManager();
         epic = manager.create(new Epic("Epic 1", "test epic"));
         subTask = new SubTask("Test 1", "Testing subtask 1", Status.NEW, null, Duration.ofMinutes(5), now, epic.getId());
-        HttpTaskServer.setManager(manager);
-        HttpTaskServer.start();
+        server = new HttpTaskServer(manager);
+        server.start();
     }
 
     @AfterEach
     void stopServer() {
-        HttpTaskServer.stop();
-        HttpTaskServer.setManager(null);
+        server.stop();
     }
 
     @Test

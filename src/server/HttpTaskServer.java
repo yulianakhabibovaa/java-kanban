@@ -6,7 +6,7 @@ import handlers.HistoryHandler;
 import handlers.PrioritizedHandler;
 import handlers.SubTasksHandler;
 import handlers.TasksHandler;
-import manager.Managers;
+
 import manager.TaskManager;
 
 import java.io.IOException;
@@ -20,12 +20,9 @@ public class HttpTaskServer {
 
     private static TaskManager manager;
 
-    public static void main(String[] args) throws IOException {
-        start();
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
-    }
+    public HttpTaskServer(TaskManager manager) throws IOException {
 
-    public static void start() throws IOException {
+        HttpTaskServer.manager = manager;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler());
         httpServer.createContext("/subtasks", new SubTasksHandler());
@@ -33,6 +30,14 @@ public class HttpTaskServer {
         httpServer.createContext("/history", new HistoryHandler());
         httpServer.createContext("/prioritized", new PrioritizedHandler());
 
+    }
+
+    public static void main(String[] args) {
+        start();
+        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+    }
+
+    public static void start() {
         httpServer.start();
     }
 
@@ -41,13 +46,6 @@ public class HttpTaskServer {
     }
 
     public static TaskManager getManager() {
-        if (manager == null) {
-            manager = Managers.getDefault();
-        }
         return manager;
-    }
-
-    public static void setManager(TaskManager newManager) {
-        manager = newManager;
     }
 }

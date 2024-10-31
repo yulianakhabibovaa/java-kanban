@@ -75,7 +75,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         String body = new String(exchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
 
         try {
-            Epic epic = gson.fromJson(body, Epic.class);
+            Epic epic = new Epic(gson.fromJson(body, Epic.class));
             Epic saved;
             if (epic.getId() == null) {
                 saved = HttpTaskServer.getManager().create(epic);
