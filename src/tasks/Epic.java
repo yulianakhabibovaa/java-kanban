@@ -10,7 +10,7 @@ import static tasks.TaskUtils.dateToString;
 
 public class Epic extends Task {
 
-    private final ArrayList<SubTask> subTasks;
+    private ArrayList<SubTask> subTasks;
     private LocalDateTime endTime;
 
     public Epic(Epic epic) {
@@ -52,11 +52,13 @@ public class Epic extends Task {
     }
 
     public void addSubTask(SubTask subTask) {
-        if (!subTasks.contains(subTask)) {
+        if (subTasks == null) {
+            subTasks = new ArrayList<>(List.of(subTask));
+        } else if (!subTasks.contains(subTask)) {
             subTasks.add(subTask);
-            setEpicStatus();
-            calculateTimes();
         }
+        setEpicStatus();
+        calculateTimes();
     }
 
     public void clearSubTask(SubTask subTask) {
@@ -68,7 +70,7 @@ public class Epic extends Task {
     }
 
     public void updateSubTask(SubTask subTask) {
-        if (subTasks.contains(subTask)) {
+        if (subTasks != null && subTasks.contains(subTask)) {
             subTasks.remove(subTask);
             subTasks.add(subTask);
             setEpicStatus();
@@ -85,14 +87,13 @@ public class Epic extends Task {
     private void calculateTimes() {
         startTime = null;
         endTime = null;
-        if (subTasks == null) {
-            duration = Duration.ZERO;
-        } else {
+        duration = Duration.ZERO;
+        if (subTasks != null) {
             subTasks.forEach(task -> {
                 if (startTime == null || task.startTime.isBefore(startTime)) {
                     startTime = task.startTime;
                 }
-                duration = duration.plus(task.duration);
+                duration = duration.plus(task.getDuration());
                 if (endTime == null || task.getEndTime().isAfter(endTime)) {
                     endTime = task.getEndTime();
                 }

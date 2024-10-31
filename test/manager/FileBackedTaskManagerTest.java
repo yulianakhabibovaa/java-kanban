@@ -80,6 +80,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         FileBackedTaskManager taskManager = createTaskManager();
         taskManager.create(task);
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
 
         List<String> lines = Files.readAllLines(file.toPath());

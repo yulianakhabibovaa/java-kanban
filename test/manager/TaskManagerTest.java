@@ -29,7 +29,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void initManager() {
         task = new Task("задача", "я задача", Duration.ofMinutes(30L), now);
         epic = new Epic("эпик", "я эпик");
-        subTask = new SubTask("подзадача", "я подзадача", epic, Duration.ofMinutes(30L), now.plusMinutes(30L));
+        subTask = new SubTask("подзадача", "я подзадача", epic.getId(), Duration.ofMinutes(30L), now.plusMinutes(30L));
     }
 
     protected abstract T createTaskManager();
@@ -46,6 +46,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldGetSubTasks() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
 
         assertEquals(List.of(subTask), taskManager.getSubTasks());
@@ -55,6 +56,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldGetEpics() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
 
         assertEquals(List.of(epic), taskManager.getEpics());
     }
@@ -72,6 +74,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldClearSubTasks() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
         taskManager.clearSubTasks();
 
@@ -82,6 +85,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldClearEpics() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
         taskManager.clearEpics();
         assertEquals(List.of(), taskManager.getEpics());
@@ -102,8 +106,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldGetSubTaskById() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
-        SubTask subTask2 = taskManager.create(new SubTask("subtask2", "description2", epic, Duration.ofMinutes(10), now.plusMinutes(60)));
+        SubTask subTask2 = taskManager.create(new SubTask("subtask2", "description2", epic.getId(), Duration.ofMinutes(10), now.plusMinutes(60)));
 
         assertEquals(subTask, taskManager.getSubTaskById(1));
         assertEquals(subTask2, taskManager.getSubTaskById(2));
@@ -134,8 +139,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldClearSubTaskById() {
         T taskManager = createTaskManager();
         taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         taskManager.create(subTask);
-        SubTask subTask2 = taskManager.create(new SubTask("subtask2", "description2", epic, Duration.ofMinutes(10), now.plusMinutes(60)));
+        SubTask subTask2 = taskManager.create(new SubTask("subtask2", "description2", epic.getId(), Duration.ofMinutes(10), now.plusMinutes(60)));
         taskManager.clearSubTaskById(1);
 
         assertEquals(1, taskManager.getSubTasks().size());
@@ -186,13 +192,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldCreateSubTask() {
         T taskManager = createTaskManager();
         Epic savedEpic = taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         SubTask savedSubTask = taskManager.create(subTask);
 
         assertEquals(1, taskManager.getSubTasks().size());
         assertEquals(1, savedSubTask.getId());
         assertEquals("подзадача", savedSubTask.getTitle(), "Title не совпал");
         assertEquals("я подзадача", savedSubTask.getDescription(), "Description не совпал");
-        assertEquals(savedEpic, taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
+        assertEquals(savedEpic.getId(), taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
     }
 
     @Test
@@ -238,6 +245,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldRemoveDeletedSubtaskFromEpic() {
         T taskManager = createTaskManager();
         Epic savedEpic = taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         SubTask savedSubTask = taskManager.create(subTask);
 
         assertEquals(savedSubTask, savedEpic.getSubTasks().getFirst(), "В эпике не сохранилась подзадача");
@@ -252,9 +260,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldGetSubTasksForEpic() {
         T taskManager = createTaskManager();
         Epic savedEpic = taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         SubTask savedSubTask = taskManager.create(subTask);
 
-        List<SubTask> epicsSubtasks = taskManager.getSubTasksByEpic(savedEpic);
+        List<SubTask> epicsSubtasks = taskManager.getSubTasksByEpic(savedEpic.getId());
         assertEquals(1, epicsSubtasks.size());
         assertEquals(savedSubTask, epicsSubtasks.getFirst());
     }
@@ -294,6 +303,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldUpdateSubTask() {
         T taskManager = createTaskManager();
         Epic savedEpic = taskManager.create(epic);
+        subTask.setCurrentEpic(epic);
         SubTask savedSubTask = taskManager.create(subTask);
         SubTask newSubTask = savedSubTask.copy();
         newSubTask.setStatus(Status.DONE);
@@ -305,7 +315,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals("newSubtask", updatedSubTask.getTitle(), "Title не совпал");
         assertEquals("я подзадача", updatedSubTask.getDescription(), "Description не совпал");
         assertEquals(Status.DONE, updatedSubTask.getStatus(), "Status не совпал");
-        assertEquals(savedEpic, taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
+        assertEquals(savedEpic.getId(), taskManager.getSubTaskById(1).getCurrentEpic(), "Epic не совпадает");
         assertEquals(Status.DONE, taskManager.getEpicById(0).getStatus(), "Статус epic не изменился");
     }
 
@@ -313,11 +323,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldGetPrioritizedTasks() {
         T taskManager = createTaskManager();
         Task task1 = new Task("задача 1", "я задача 1", Duration.ofMinutes(30L), now.plusMinutes(75L));
-        Task task2 = new Task("задача 2", "я задача 2", Duration.ofMinutes(30L), null);
-        SubTask subTask1 = new SubTask("задача", "я подзадача", epic, Duration.ofMinutes(30L), now.plusMinutes(30L));
-
         taskManager.create(task1);
         taskManager.create(epic);
+        Task task2 = new Task("задача 2", "я задача 2", Duration.ofMinutes(30L), null);
+        SubTask subTask1 = new SubTask("задача", "я подзадача", epic.getId(), Duration.ofMinutes(30L), now.plusMinutes(30L));
         taskManager.create(subTask1);
         taskManager.create(task2);
 

@@ -33,7 +33,7 @@ public interface TaskManager {
 
     void clearEpicById(Integer id);
 
-    ArrayList<SubTask> getSubTasksByEpic(Epic epic);
+    ArrayList<SubTask> getSubTasksByEpic(Integer id);
 
     Task create(Task task);
 
