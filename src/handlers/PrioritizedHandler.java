@@ -2,12 +2,17 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import server.HttpTaskServer;
+import manager.TaskManager;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
+
+    public PrioritizedHandler(TaskManager manager) {
+        super(manager);
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
@@ -20,7 +25,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetPrioritized(HttpExchange exchange) throws IOException {
-        sendText(exchange, 200, gson.toJson(HttpTaskServer.getManager().getPrioritizedTasks()));
+        sendText(exchange, 200, gson.toJson(manager.getPrioritizedTasks()));
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {

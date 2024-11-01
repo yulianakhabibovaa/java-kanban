@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class HttpTaskServerTasksTest {
 
-    InMemoryTaskManager manager;
+    InMemoryTaskManager manager = new InMemoryTaskManager();
     HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
@@ -33,7 +33,8 @@ class HttpTaskServerTasksTest {
     @BeforeEach
     void initServer() throws IOException {
         task = new Task("Test 1", "Testing task 1", Status.NEW, null, Duration.ofMinutes(5), now);
-        manager = new InMemoryTaskManager();
+        manager.clearTasks();
+        manager.clearEpics();
         server = new HttpTaskServer(manager);
         server.start();
     }

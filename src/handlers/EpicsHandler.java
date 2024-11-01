@@ -5,7 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.ManagerTimeCrossingException;
 import exceptions.NotFoundException;
-import server.HttpTaskServer;
+import manager.TaskManager;
 import tasks.Epic;
 import tasks.SubTask;
 
@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
+
+    public EpicsHandler(TaskManager manager) {
+        super(manager);
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -52,7 +56,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         }
 
         try {
-            List<SubTask> subtasks = HttpTaskServer.getManager().getSubTasksByEpic(postIdOpt.get());
+            List<SubTask> subtasks = manager.getSubTasksByEpic(postIdOpt.get());
             sendText(exchange, 200, gson.toJson(subtasks));
         } catch (NotFoundException e) {
             sendNotFound(exchange);
@@ -67,7 +71,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             sendIncorrectId(exchange);
         }
 
-        HttpTaskServer.getManager().clearEpicById(taskIdOpt.get());
+        manager.clearEpicById(taskIdOpt.get());
         sendText(exchange, 200, "Эпик с id " + taskIdOpt.get() + " удален");
     }
 
@@ -78,9 +82,9 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             Epic epic = new Epic(gson.fromJson(body, Epic.class));
             Epic saved;
             if (epic.getId() == null) {
-                saved = HttpTaskServer.getManager().create(epic);
+                saved = manager.create(epic);
             } else {
-                saved = HttpTaskServer.getManager().update(epic);
+                saved = manager.update(epic);
             }
             sendText(exchange, 201, gson.toJson(saved));
         } catch (JsonSyntaxException e) {
@@ -99,7 +103,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         }
 
         try {
-            Epic epic = HttpTaskServer.getManager().getEpicById(postIdOpt.get());
+            Epic epic = manager.getEpicById(postIdOpt.get());
             sendText(exchange, 200, gson.toJson(epic));
         } catch (NotFoundException e) {
             sendNotFound(exchange);
@@ -109,7 +113,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetEpics(HttpExchange exchange) throws IOException {
-        sendText(exchange, 200, gson.toJson(HttpTaskServer.getManager().getEpics()));
+        sendText(exchange, 200, gson.toJson(manager.getEpics()));
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {

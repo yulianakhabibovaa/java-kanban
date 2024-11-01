@@ -5,13 +5,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.ManagerTimeCrossingException;
 import exceptions.NotFoundException;
-import server.HttpTaskServer;
+import manager.TaskManager;
 import tasks.Task;
 
 import java.io.IOException;
 import java.util.Optional;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
+
+    public TasksHandler(TaskManager manager) {
+        super(manager);
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -45,7 +49,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             sendIncorrectId(exchange);
         }
 
-        HttpTaskServer.getManager().clearTaskById(taskIdOpt.get());
+        manager.clearTaskById(taskIdOpt.get());
         sendText(exchange, 200, "Задача с id " + taskIdOpt.get() + " удалена");
     }
 
@@ -56,9 +60,9 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             Task task = gson.fromJson(body, Task.class);
             Task saved;
             if (task.getId() == null) {
-                saved = HttpTaskServer.getManager().create(task);
+                saved = manager.create(task);
             } else {
-                saved = HttpTaskServer.getManager().update(task);
+                saved = manager.update(task);
             }
             sendText(exchange, 201, gson.toJson(saved));
         } catch (JsonSyntaxException e) {
@@ -77,7 +81,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
 
         try {
-            Task task = HttpTaskServer.getManager().getTaskById(postIdOpt.get());
+            Task task = manager.getTaskById(postIdOpt.get());
             sendText(exchange, 200, gson.toJson(task));
         } catch (NotFoundException e) {
             sendNotFound(exchange);
@@ -87,7 +91,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetTasks(HttpExchange exchange) throws IOException {
-        sendText(exchange, 200, gson.toJson(HttpTaskServer.getManager().getTasks()));
+        sendText(exchange, 200, gson.toJson(manager.getTasks()));
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {

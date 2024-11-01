@@ -2,12 +2,17 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import server.HttpTaskServer;
+import manager.TaskManager;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+
+    public HistoryHandler(TaskManager manager) {
+        super(manager);
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
@@ -20,7 +25,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetHistory(HttpExchange exchange) throws IOException {
-        sendText(exchange, 200, gson.toJson(HttpTaskServer.getManager().getHistory()));
+        sendText(exchange, 200, gson.toJson(manager.getHistory()));
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {

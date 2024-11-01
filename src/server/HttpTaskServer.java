@@ -18,17 +18,17 @@ public class HttpTaskServer {
 
     private static HttpServer httpServer;
 
-    private static TaskManager manager;
+    private final TaskManager manager;
 
     public HttpTaskServer(TaskManager manager) throws IOException {
 
-        HttpTaskServer.manager = manager;
+        this.manager = manager;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-        httpServer.createContext("/tasks", new TasksHandler());
-        httpServer.createContext("/subtasks", new SubTasksHandler());
-        httpServer.createContext("/epics", new EpicsHandler());
-        httpServer.createContext("/history", new HistoryHandler());
-        httpServer.createContext("/prioritized", new PrioritizedHandler());
+        httpServer.createContext("/tasks", new TasksHandler(manager));
+        httpServer.createContext("/subtasks", new SubTasksHandler(manager));
+        httpServer.createContext("/epics", new EpicsHandler(manager));
+        httpServer.createContext("/history", new HistoryHandler(manager));
+        httpServer.createContext("/prioritized", new PrioritizedHandler(manager));
 
     }
 
@@ -43,9 +43,5 @@ public class HttpTaskServer {
 
     public static void stop() {
         httpServer.stop(0);
-    }
-
-    public static TaskManager getManager() {
-        return manager;
     }
 }

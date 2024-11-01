@@ -21,16 +21,17 @@ import java.util.List;
 import static handlers.BaseHttpHandler.gson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HttpTaskServerPrioritizedTest {
+class HttpTaskServerPrioritizedTest {
 
-    InMemoryTaskManager manager;
+    InMemoryTaskManager manager = new InMemoryTaskManager();
     HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void initServer() throws IOException {
-        manager = new InMemoryTaskManager();
+        manager.clearTasks();
+        manager.clearEpics();
         server = new HttpTaskServer(manager);
         server.start();
     }

@@ -5,13 +5,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.ManagerTimeCrossingException;
 import exceptions.NotFoundException;
-import server.HttpTaskServer;
+import manager.TaskManager;
 import tasks.SubTask;
 
 import java.io.IOException;
 import java.util.Optional;
 
 public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
+
+    public SubTasksHandler(TaskManager manager) {
+        super(manager);
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -45,7 +49,7 @@ public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
             sendIncorrectId(exchange);
         }
 
-        HttpTaskServer.getManager().clearSubTaskById(taskIdOpt.get());
+        manager.clearSubTaskById(taskIdOpt.get());
         sendText(exchange, 200, "Подзадача с id " + taskIdOpt.get() + " удалена");
     }
 
@@ -56,9 +60,9 @@ public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
             SubTask subtask = gson.fromJson(body, SubTask.class);
             SubTask saved;
             if (subtask.getId() == null) {
-                saved = HttpTaskServer.getManager().create(subtask);
+                saved = manager.create(subtask);
             } else {
-                saved = HttpTaskServer.getManager().update(subtask);
+                saved = manager.update(subtask);
             }
             sendText(exchange, 201, gson.toJson(saved));
         } catch (JsonSyntaxException e) {
@@ -77,7 +81,7 @@ public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
         }
 
         try {
-            SubTask subtask = HttpTaskServer.getManager().getSubTaskById(postIdOpt.get());
+            SubTask subtask = manager.getSubTaskById(postIdOpt.get());
             sendText(exchange, 200, gson.toJson(subtask));
         } catch (NotFoundException e) {
             sendNotFound(exchange);
@@ -87,7 +91,7 @@ public class SubTasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetSubTasks(HttpExchange exchange) throws IOException {
-        sendText(exchange, 200, gson.toJson(HttpTaskServer.getManager().getSubTasks()));
+        sendText(exchange, 200, gson.toJson(manager.getSubTasks()));
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {

@@ -22,17 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HttpTaskServerHistoryTest {
 
-    InMemoryTaskManager manager;
+    InMemoryTaskManager manager = new InMemoryTaskManager();
     HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
 
-    HttpTaskServerHistoryTest() throws IOException {
-    }
-
     @BeforeEach
     void initServer() throws IOException {
-        manager = new InMemoryTaskManager();
+        manager.clearTasks();
+        manager.clearEpics();
         server = new HttpTaskServer(manager);
         server.start();
     }

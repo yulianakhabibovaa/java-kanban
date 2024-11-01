@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class HttpTaskServerEpicsTest {
-    InMemoryTaskManager manager;
+    InMemoryTaskManager manager = new InMemoryTaskManager();
     HttpTaskServer server;
     HttpClient client = HttpClient.newHttpClient();
     LocalDateTime now = LocalDateTime.now();
@@ -32,7 +32,8 @@ class HttpTaskServerEpicsTest {
 
     @BeforeEach
     void initServer() throws IOException {
-        manager = new InMemoryTaskManager();
+        manager.clearEpics();
+        manager.clearTasks();
         server = new HttpTaskServer(manager);
         epic = new Epic("Epic 1", "test epic");
         server.start();
@@ -41,7 +42,6 @@ class HttpTaskServerEpicsTest {
     @AfterEach
     void stopServer() {
         server.stop();
-        manager = null;
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import handlers.adapters.DurationAdapter;
 import handlers.adapters.LocalDateTimeAdapter;
+import manager.TaskManager;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,11 +17,17 @@ import java.util.Optional;
 public class BaseHttpHandler {
     protected static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+    protected final TaskManager manager;
+
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
             .serializeNulls()
             .create();
+
+    public BaseHttpHandler(TaskManager manager) {
+        this.manager = manager;
+    }
 
     protected void sendText(HttpExchange exchange, int responseCode, String text) throws IOException {
         byte[] response = text.getBytes(DEFAULT_CHARSET);
