@@ -19,10 +19,10 @@ public class Main {
         Task task1 = taskManager.create(new Task("Задача 1", "Описание задачи 1", Duration.ofMinutes(30L), now.plusMinutes(30L)));
         Task task2 = taskManager.create(new Task("Задача 2", "Описание задачи 2", Duration.ofMinutes(30L), now.plusMinutes(60L)));
         Epic epic1 = taskManager.create(new Epic("Эпик 1", "Описание эпика 1"));
-        SubTask subTask1 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic1, Duration.ofMinutes(30L), now.plusMinutes(90L)));
-        SubTask subTask2 = taskManager.create(new SubTask("Подзадача 2", "Описание подзадачи 2", epic1, Duration.ofMinutes(30L), now.plusMinutes(120L)));
+        SubTask subTask1 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic1.getId(), Duration.ofMinutes(30L), now.plusMinutes(90L)));
+        SubTask subTask2 = taskManager.create(new SubTask("Подзадача 2", "Описание подзадачи 2", epic1.getId(), Duration.ofMinutes(30L), now.plusMinutes(120L)));
         Epic epic2 = taskManager.create(new Epic("Эпик 2", "Описание эпика 2"));
-        SubTask subTask3 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic2, Duration.ofMinutes(30L), now.plusMinutes(150L)));
+        SubTask subTask3 = taskManager.create(new SubTask("Подзадача 1", "Описание подзадачи 1", epic2.getId(), Duration.ofMinutes(30L), now.plusMinutes(150L)));
         taskManager.getEpicById(2);
         taskManager.getSubTaskById(6);
         taskManager.getTaskById(0);
@@ -55,7 +55,7 @@ public class Main {
         for (Epic epic : manager.getEpics()) {
             System.out.println(epic);
 
-            for (SubTask task : manager.getSubTasksByEpic(epic)) {
+            for (SubTask task : manager.getSubTasksByEpic(epic.getId())) {
                 System.out.println("--> " + task);
             }
         }

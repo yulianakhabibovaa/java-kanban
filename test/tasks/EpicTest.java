@@ -20,9 +20,9 @@ class EpicTest {
     @BeforeEach
     void initManager() {
         epic = new Epic("Эпик", "Описание", Status.NEW, 1, new ArrayList<>(), Duration.ZERO, null, null);
-        subTaskNew = new SubTask("задача", "я подзадача", Status.NEW, 2, Duration.ofMinutes(60L), now, epic);
-        subTaskDone = new SubTask("задача", "я подзадача", Status.DONE, 3, Duration.ofMinutes(60L), now, epic);
-        subTaskInProgress = new SubTask("задача", "я подзадача", Status.IN_PROGRESS, 4, Duration.ofMinutes(60L), now, epic);
+        subTaskNew = new SubTask("задача", "я подзадача", Status.NEW, 2, Duration.ofMinutes(60L), now, epic.getId());
+        subTaskDone = new SubTask("задача", "я подзадача", Status.DONE, 3, Duration.ofMinutes(60L), now, epic.getId());
+        subTaskInProgress = new SubTask("задача", "я подзадача", Status.IN_PROGRESS, 4, Duration.ofMinutes(60L), now, epic.getId());
     }
 
     @Test

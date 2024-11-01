@@ -10,16 +10,16 @@ import static tasks.TaskUtils.dateToString;
 
 public class Epic extends Task {
 
-    private final ArrayList<SubTask> subTasks;
+    private ArrayList<SubTask> subTasks;
     private LocalDateTime endTime;
 
     public Epic(Epic epic) {
         this(epic.title, epic.description, epic.status, epic.id, epic.subTasks, epic.duration, epic.startTime, epic.endTime);
     }
 
-    public Epic(String title, String description, Status status, int id, List<SubTask> subTasks, Duration duration, LocalDateTime startTime, LocalDateTime endTime) {
+    public Epic(String title, String description, Status status, Integer id, List<SubTask> subTasks, Duration duration, LocalDateTime startTime, LocalDateTime endTime) {
         super(title, description, status, id, duration, startTime);
-        this.subTasks = (ArrayList<SubTask>) subTasks;
+        this.subTasks = subTasks == null ? new ArrayList<>() : (ArrayList<SubTask>) subTasks;
         this.endTime = endTime == null ? null : endTime.truncatedTo(ChronoUnit.SECONDS);
     }
 
@@ -54,9 +54,9 @@ public class Epic extends Task {
     public void addSubTask(SubTask subTask) {
         if (!subTasks.contains(subTask)) {
             subTasks.add(subTask);
-            setEpicStatus();
-            calculateTimes();
         }
+        setEpicStatus();
+        calculateTimes();
     }
 
     public void clearSubTask(SubTask subTask) {
@@ -68,7 +68,7 @@ public class Epic extends Task {
     }
 
     public void updateSubTask(SubTask subTask) {
-        if (subTasks.contains(subTask)) {
+        if (subTasks != null && subTasks.contains(subTask)) {
             subTasks.remove(subTask);
             subTasks.add(subTask);
             setEpicStatus();
@@ -85,14 +85,13 @@ public class Epic extends Task {
     private void calculateTimes() {
         startTime = null;
         endTime = null;
-        if (subTasks == null) {
-            duration = Duration.ZERO;
-        } else {
+        duration = Duration.ZERO;
+        if (subTasks != null) {
             subTasks.forEach(task -> {
                 if (startTime == null || task.startTime.isBefore(startTime)) {
                     startTime = task.startTime;
                 }
-                duration = duration.plus(task.duration);
+                duration = duration.plus(task.getDuration());
                 if (endTime == null || task.getEndTime().isAfter(endTime)) {
                     endTime = task.getEndTime();
                 }

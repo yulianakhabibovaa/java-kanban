@@ -10,7 +10,7 @@ public class TaskUtils {
     }
 
     public static String toString(SubTask task) {
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s%n", task.getId(), SUBTASK, task.getTitle(), task.getStatus(), task.getDescription(), task.getDuration().toMinutes(), dateToString(task.getStartTime()), dateToString(task.getEndTime()), task.getCurrentEpic().getId());
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s%n", task.getId(), SUBTASK, task.getTitle(), task.getStatus(), task.getDescription(), task.getDuration().toMinutes(), dateToString(task.getStartTime()), dateToString(task.getEndTime()), task.getCurrentEpic());
     }
 
     public static String toString(Epic task) {
